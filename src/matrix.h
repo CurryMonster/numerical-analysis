@@ -1,11 +1,17 @@
 #pragma once
 
 #include <iostream>
-#include <assert.h>
+#include <cassert>
+#include <iomanip>
 #include <initializer_list>
 
 using std::size_t;
 using std::initializer_list;
+using std::ostream;
+using std::cout;
+using std::setprecision;
+using std::setw;
+using std::left;
 
 template<typename T>
 class Matrix
@@ -31,17 +37,17 @@ Matrix<T> operator+(const Matrix<T>& lhs, const Matrix<T>& rhs)
 {
     assert(lhs.rows() == rhs.rows() && lhs.columns() == rhs.columns());
 
-    Matrix<T> t (lhs.rows(), lhs.columns());
+    Matrix<T> m (lhs.rows(), lhs.columns());
 
     for (size_t i {0}; i < lhs.rows(); i++)
     {
         for (size_t j {0}; j < lhs.columns(); j++)
         {
-            t(i, j) = lhs(i, j) + rhs(i, j);
+            m(i, j) = lhs(i, j) + rhs(i, j);
         }
     }
 
-    return t;
+    return m;
 }
 
 template<typename T>
@@ -49,24 +55,25 @@ Matrix<T> operator-(const Matrix<T>& lhs, const Matrix<T>& rhs)
 {
     assert(lhs.rows() == rhs.rows() && lhs.columns() == rhs.columns());
 
-    Matrix<T> t (lhs.rows(), lhs.columns());
+    Matrix<T> m (lhs.rows(), lhs.columns());
 
     for (size_t i {0}; i < lhs.rows(); i++)
     {
         for (size_t j {0}; j < lhs.columns(); j++)
         {
-            t(i, j) = lhs(i, j) - rhs(i, j);
+            m(i, j) = lhs(i, j) - rhs(i, j);
         }
     }
 
-    return t;
+    return m;
 }
 
 template<typename T>
 Matrix<T> operator*(const Matrix<T>& lhs, const Matrix<T>& rhs)
 {
     assert(lhs.columns() == rhs.rows());
-    Matrix<T> t {lhs.rows(), rhs.columns()};
+
+    Matrix<T> m {lhs.rows(), rhs.columns()};
     
     for (size_t i {0}; i < lhs.rows(); i++)
     {
@@ -74,12 +81,12 @@ Matrix<T> operator*(const Matrix<T>& lhs, const Matrix<T>& rhs)
         {
             for (size_t k {0}; k < lhs.columns(); k++)
             {
-                t(i, j) += lhs(i, k) * rhs(k, j);
+                m(i, j) += lhs(i, k) * rhs(k, j);
             }
         }
     }
 
-    return t;
+    return m;
 }
 
 template<typename T>
@@ -87,47 +94,61 @@ Matrix<T> operator/(const Matrix<T>& lhs, const T& rhs)
 {
     const T inv_rhs {1 / rhs};
 
-    Matrix<T> t {lhs.rows(), lhs.columns()};
+    Matrix<T> m {lhs.rows(), lhs.columns()};
 
     for (size_t i {0}; i < lhs.rows(); i++)
     {
         for (size_t j {0}; j < lhs.columns(); j++)
         {
-            t(i, j) = lhs(i, j) * inv_rhs;
+            m(i, j) = lhs(i, j) * inv_rhs;
         }
     }
 
-    return t;
+    return m;
 }
 
 template<typename T>
 Matrix<T> operator*(const Matrix<T>& lhs, const T& rhs)
 {
-    Matrix<T> t {lhs.rows(), lhs.columns()};
+    Matrix<T> m {lhs.rows(), lhs.columns()};
 
     for (size_t i {0}; i < lhs.rows(); i++)
     {
         for (size_t j {0}; j < lhs.columns(); j++)
         {
-            t(i, j) = lhs(i, j) * rhs;
+            m(i, j) = lhs(i, j) * rhs;
         }
     }
 
-    return t;    
+    return m;    
 }
 
 template<typename T>
 Matrix<T> operator*(const T& lhs, const Matrix<T>& rhs)
 {
-    Matrix<T> t {lhs.rows(), lhs.columns()};
+    Matrix<T> m {rhs.rows(), rhs.columns()};
 
-    for (size_t i {0}; i < lhs.rows(); i++)
+    for (size_t i {0}; i < rhs.rows(); i++)
     {
-        for (size_t j {0}; j < lhs.columns(); j++)
+        for (size_t j {0}; j < rhs.columns(); j++)
         {
-            t(i, j) = lhs * rhs(i, j);
+            m(i, j) = lhs * rhs(i, j);
         }
     }
 
-    return t;       
+    return m;       
+}
+
+template<typename T> ostream& operator<<(ostream& os, const Matrix<T>& rhs)
+{
+    cout << "\n";
+    for (size_t i {0}; i < rhs.rows(); i++)
+    {
+        for (size_t j {0}; j < rhs.columns(); j++)
+        {
+            cout << setprecision(3) << setw(5) << left << rhs(i, j) << " ";
+        }
+        cout << "\n";
+    }
+    return os;
 }
